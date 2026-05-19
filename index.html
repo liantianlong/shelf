@@ -23,10 +23,13 @@
 body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;
   background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;
+  background-image:radial-gradient(ellipse at 20% -10%,color-mix(in srgb,var(--accent) 6%,transparent) 0,transparent 60%),
+    radial-gradient(ellipse at 80% 110%,color-mix(in srgb,var(--accent) 5%,transparent) 0,transparent 60%);
 }
 .container{max-width:1200px;margin:0 auto;padding:24px 20px 60px}
-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:10px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:10px;position:relative}
 header h1{font-size:22px;font-weight:700;letter-spacing:.02em}
+header::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:2px;background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 30%,transparent),var(--accent),color-mix(in srgb,var(--accent) 30%,transparent));border-radius:1px;opacity:.7}
 .header-right{display:flex;align-items:center;gap:8px}
 .icon-btn{
   width:32px;height:32px;border-radius:7px;border:1px solid var(--border);
@@ -45,9 +48,10 @@ header h1{font-size:22px;font-weight:700;letter-spacing:.02em}
 .toolbar{
   display:flex;align-items:center;gap:10px;margin-bottom:12px;
   background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
-  padding:8px 14px;transition:border-color .2s;
+  padding:8px 14px;transition:border-color .2s,box-shadow .2s;
+  box-shadow:0 1px 2px rgba(0,0,0,.03);
 }
-.toolbar:focus-within{border-color:var(--accent)}
+.toolbar:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 12%,transparent)}
 .toolbar input{
   flex:1;border:none;outline:none;font-size:14px;background:transparent;color:var(--text);
 }
@@ -55,10 +59,13 @@ header h1{font-size:22px;font-weight:700;letter-spacing:.02em}
 .table-wrap{
   background:var(--card);border:1px solid var(--border);
   border-radius:var(--radius);overflow:hidden;
+  box-shadow:0 1px 3px rgba(0,0,0,.04),0 2px 8px rgba(0,0,0,.04);
+  transition:box-shadow .25s;
 }
+.table-wrap:hover{box-shadow:0 4px 16px rgba(0,0,0,.06),0 8px 32px rgba(0,0,0,.04)}
 .table-scroll{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:14px}
-thead{background:var(--thead);border-bottom:2px solid var(--border)}
+thead{background:linear-gradient(135deg,var(--thead),var(--hover));border-bottom:2px solid var(--border)}
 th{
   padding:10px 14px;text-align:left;font-weight:600;font-size:12px;
   color:var(--text2);white-space:nowrap;
@@ -71,8 +78,8 @@ th .arrow{font-size:11px;margin-left:3px;opacity:.35}
 th.sorted .arrow{opacity:1}
 td{padding:9px 14px;border-bottom:1px solid var(--row-border)}
 tr:last-child td{border-bottom:none}
-tbody tr{transition:background .1s}
-tbody tr:hover{background:var(--hover)}
+tbody tr{cursor:default;transition:background .15s,transform .15s}
+tbody tr:hover{background:var(--hover);transform:translateX(3px)}
 .link{color:var(--accent);text-decoration:none;font-weight:500}
 .link:hover{text-decoration:underline}
 .stars{letter-spacing:1px}
@@ -81,7 +88,8 @@ tbody tr:hover{background:var(--hover)}
 .no-result{text-align:center;padding:40px;color:#bbb;font-size:14px}
 
 /* Tag colors */
-.tag{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;margin:1px 2px;white-space:nowrap}
+.tag{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;margin:1px 2px;white-space:nowrap;cursor:default;transition:transform .15s,filter .15s}
+.tag:hover{transform:translateY(-1px);filter:brightness(1.08)}
 .tag-default{background:#f3f4f6;color:#6b7280}
 .tag-小说{background:#fff0f3;color:#c9184a}
 .tag-哲学{background:#f5f0ff;color:#7c3aed}
