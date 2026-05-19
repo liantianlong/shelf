@@ -403,7 +403,7 @@ function setFilter(id,value){
   filterTable(id.split('-')[0]);
 }
 document.addEventListener('click',function(){closeAllDropdowns()});
-window.addEventListener('scroll',function(){closeAllDropdowns()},true);
+window.addEventListener('scroll',function(e){if(!e.target.closest('.dropdown.show'))closeAllDropdowns()},true);
 window.addEventListener('resize',function(){closeAllDropdowns()});
 
 // --- Sort (date only) ---
