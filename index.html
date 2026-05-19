@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Books & Movies</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8f8f7;--card:#fff;--border:#eaeaea;--text:#1a1a1a;--text2:#6b6b6b;
+  --accent:#4f46e5;--hover:#f7f7f5;--thead:#fafbfc;--row-border:#f4f4f4;--radius:10px;
+}
+[data-theme="dark"]{
+  --bg:#1a1a1b;--card:#252526;--border:#3a3a3c;--text:#e0e0e0;--text2:#999;
+  --accent:#818cf8;--hover:#2d2d2f;--thead:#2d2d2f;--row-border:#333;
+}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#1a1a1b;--card:#252526;--border:#3a3a3c;--text:#e0e0e0;--text2:#999;
+    --accent:#818cf8;--hover:#2d2d2f;--thead:#2d2d2f;--row-border:#333;
+  }
+}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;
+}
+.container{max-width:1200px;margin:0 auto;padding:24px 20px 60px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:10px}
+header h1{font-size:22px;font-weight:700;letter-spacing:.02em}
+.header-right{display:flex;align-items:center;gap:8px}
+.icon-btn{
+  width:32px;height:32px;border-radius:7px;border:1px solid var(--border);
+  background:var(--card);color:var(--text2);cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.icon-btn:hover{border-color:var(--accent);color:var(--accent)}
+.tabs{display:inline-flex;gap:4px;background:var(--hover);border-radius:10px;padding:4px}
+.tab{
+  padding:8px 20px;font-size:14px;font-weight:500;
+  border:none;background:transparent;color:var(--text2);
+  cursor:pointer;border-radius:7px;transition:all .2s;
+}
+.tab:hover{color:var(--text)}
+.tab.active{background:var(--accent);color:#fff}
+.toolbar{
+  display:flex;align-items:center;gap:10px;margin-bottom:12px;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:8px 14px;transition:border-color .2s;
+}
+.toolbar:focus-within{border-color:var(--accent)}
+.toolbar input{
+  flex:1;border:none;outline:none;font-size:14px;background:transparent;color:var(--text);
+}
+.toolbar input::placeholder{color:#bbb}
+.table-wrap{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;
+}
+.table-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+thead{background:var(--thead);border-bottom:2px solid var(--border)}
+th{
+  padding:10px 14px;text-align:left;font-weight:600;font-size:12px;
+  color:var(--text2);white-space:nowrap;
+  user-select:none;text-transform:uppercase;letter-spacing:.04em;
+}
+th.sortable{cursor:pointer;transition:color .15s}
+th.sortable:hover{color:var(--accent)}
+th.sorted{color:var(--accent)}
+th .arrow{font-size:11px;margin-left:3px;opacity:.35}
+th.sorted .arrow{opacity:1}
+td{padding:9px 14px;border-bottom:1px solid var(--row-border)}
+tr:last-child td{border-bottom:none}
+tbody tr{transition:background .1s}
+tbody tr:hover{background:var(--hover)}
+.link{color:var(--accent);text-decoration:none;font-weight:500}
+.link:hover{text-decoration:underline}
+.stars{letter-spacing:1px}
+.empty{color:#ccc}
+.status-badge{white-space:nowrap;font-size:13px}
+.no-result{text-align:center;padding:40px;color:#bbb;font-size:14px}
+
+/* Tag colors */
+.tag{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;margin:1px 2px;white-space:nowrap}
+.tag-default{background:#f3f4f6;color:#6b7280}
+.tag-小说{background:#fff0f3;color:#c9184a}
+.tag-哲学{background:#f5f0ff;color:#7c3aed}
+.tag-科普{background:#eef4ff;color:#2563eb}
+.tag-社科{background:#ecfdf5;color:#059669}
+.tag-经济{background:#fffbf0;color:#d97706}
+.tag-理工{background:#f0fdfa;color:#0d9488}
+.tag-诗集{background:#fdf2f8;color:#c02669}
+.tag-论文{background:#f1f5f9;color:#475569}
+.tag-量子场论{background:#eef2ff;color:#4f46e5}
+.tag-剧情{background:#eef4ff;color:#2563eb}
+.tag-悬疑{background:#f3eeff;color:#6d28d9}
+.tag-爱情{background:#fdf2f8;color:#be185d}
+.tag-科幻{background:#ecfdfa;color:#0f766e}
+.tag-动画{background:#ecfdf5;color:#16a34a}
+.tag-动作{background:#fef2f2;color:#dc2626}
+.tag-喜剧{background:#fff7ed;color:#ea580c}
+.tag-冒险{background:#fffbf0;color:#b45309}
+.tag-惊悚{background:#fef2f2;color:#b91c1c}
+.tag-历史{background:#fefce8;color:#a16207}
+.tag-音乐{background:#eef2ff;color:#4338ca}
+.tag-传记{background:#ecfdfa;color:#115e59}
+.tag-家庭{background:#ecfdf5;color:#15803d}
+.tag-奇幻{background:#f5f0ff;color:#6d28d9}
+.tag-同性{background:#fff0f3;color:#c9184a}
+.tag-犯罪{background:#f1f5f9;color:#334155}
+
+/* Header dropdowns */
+.has-filter{position:relative;overflow:visible;cursor:pointer;user-select:none}
+.has-filter:hover{color:var(--text)}
+.filter-arrow{font-size:9px;margin-left:2px;color:#bbb;transition:color .15s}
+.has-filter:hover .filter-arrow{color:var(--accent)}
+.dropdown{
+  display:none;position:absolute;top:100%;left:0;z-index:100;
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  box-shadow:0 4px 16px rgba(0,0,0,.15);min-width:150px;max-height:260px;
+  overflow-y:auto;padding:4px 0;
+}
+.dropdown.show{display:block}
+.dropdown .item{
+  display:block;width:100%;padding:6px 14px;font-size:13px;text-align:left;
+  border:none;background:none;color:var(--text);cursor:pointer;
+  font-weight:400;letter-spacing:0;text-transform:none;white-space:nowrap;
+}
+.dropdown .item:hover{background:var(--hover)}
+.dropdown .item.selected{color:var(--accent);font-weight:600}
+
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.header-search{width:170px;margin-bottom:0;padding:4px 10px;flex-shrink:0}
+footer{text-align:center;margin-top:32px;font-size:12px;color:var(--text2)}
+
+@media(max-width:640px){
+  .container{padding:14px 10px 40px}
+  header h1{font-size:20px}
+  .tab{padding:7px 14px;font-size:13px}
+  .header-search{width:120px}
+  table{font-size:12px}
+  th,td{padding:7px 8px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>My Books & Movies</h1>
+  <div class="header-right">
+    <div class="toolbar header-search" id="search-books-wrap">
+      <input type="text" id="search-books" data-lang="search-books" placeholder="Search books..." oninput="filterTable('books')">
+    </div>
+    <div class="toolbar header-search" id="search-movies-wrap" style="display:none">
+      <input type="text" id="search-movies" data-lang="search-movies" placeholder="Search movies..." oninput="filterTable('movies')">
+    </div>
+    <button class="icon-btn" onclick="toggleLang()" title="zh/en" id="lang-btn">中</button>
+    <button class="icon-btn" onclick="toggleTheme()" title="Theme" id="theme-btn">🌓</button>
+    <div class="tabs">
+      <button class="tab active" data-lang="tab-books" onclick="switchTab('books')">Reading</button>
+      <button class="tab" data-lang="tab-movies" onclick="switchTab('movies')">Watching</button>
+    </div>
+  </div>
+</header>
+
+<div class="tab-panel active" id="panel-books">
+  <div class="table-wrap">
+    <div class="table-scroll">
+      <table id="table-books">
+        <thead><tr>
+          <th data-lang="th-title">Title</th>
+          <th data-lang="th-author">Author</th>
+          <th class="has-filter" onclick="toggleDropdown(event,'books-tags')"><span data-lang="th-tags">Tags</span> <span class="filter-arrow">&#9662;</span></th>
+          <th class="sortable" onclick="sortTable('books',this)"><span data-lang="th-date">Date</span> <span class="arrow">&#8645;</span></th>
+          <th class="has-filter" onclick="toggleDropdown(event,'books-status')"><span data-lang="th-status">Status</span> <span class="filter-arrow">&#9662;</span></th>
+        </tr></thead>
+        <tbody id="books-tbody"></tbody>
+      </table>
+    </div>
+    <div class="no-result" id="books-empty" style="display:none">No matching results</div>
+  </div>
+</div>
+
+<div class="tab-panel" id="panel-movies">
+  <div class="table-wrap">
+    <div class="table-scroll">
+      <table id="table-movies">
+        <thead><tr>
+          <th data-lang="th-title">Title</th>
+          <th data-lang="th-region">Region</th>
+          <th class="has-filter" onclick="toggleDropdown(event,'movies-type')"><span data-lang="th-type">Type</span> <span class="filter-arrow">&#9662;</span></th>
+          <th class="has-filter" onclick="toggleDropdown(event,'movies-tags')"><span data-lang="th-tags">Tags</span> <span class="filter-arrow">&#9662;</span></th>
+          <th class="has-filter" onclick="toggleDropdown(event,'movies-rating')"><span data-lang="th-rating">Rating</span> <span class="filter-arrow">&#9662;</span></th>
+          <th class="sortable" onclick="sortTable('movies',this)"><span data-lang="th-date">Date</span> <span class="arrow">&#8645;</span></th>
+        </tr></thead>
+        <tbody id="movies-tbody"></tbody>
+      </table>
+    </div>
+    <div class="no-result" id="movies-empty" style="display:none">No matching results</div>
+  </div>
+</div>
+
+<footer></footer>
+
+</div>
+
+<script>
+var BOOKS = [{"title": "射雕英雄传", "author": "金庸", "tags": "小说", "date": "2026-05-18", "status": "在读", "link": ""}, {"title": "币安人生", "author": "", "tags": "", "date": "2026/05/16", "status": "", "link": ""}, {"title": "小姨多鹤", "author": "严歌苓", "tags": "小说", "date": "2026/05/01", "status": "已读", "link": ""}, {"title": "陆犯焉识", "author": "严歌苓", "tags": "小说", "date": "2026/04/02", "status": "已读", "link": ""}, {"title": "红太阳是怎样升起的", "author": "高华", "tags": "", "date": "2026/02/01", "status": "已读", "link": ""}, {"title": "现代日本史", "author": "", "tags": "社科", "date": "2026/01/01", "status": "在读", "link": ""}, {"title": "解忧杂货店", "author": "东野圭吾", "tags": "小说", "date": "2025/09/06", "status": "已读", "link": ""}, {"title": "The little prince", "author": "", "tags": "小说", "date": "2025/07/07", "status": "", "link": ""}, {"title": "双脑记", "author": "加扎尼加", "tags": "科普", "date": "2025/06/19 → 2025/07/06", "status": "已读", "link": ""}, {"title": "错把妻子当帽子", "author": "奥利弗萨克斯", "tags": "科普,社科", "date": "2025/06/04 → 2025/06/08", "status": "已读", "link": ""}, {"title": "酒吧长谈", "author": "略萨", "tags": "小说", "date": "2025/04/28 → 2025/05/03", "status": "已读", "link": ""}, {"title": "人类六万年", "author": "张振", "tags": "科普", "date": "2025/04/26", "status": "已读", "link": ""}, {"title": "且听风吟", "author": "村上春树", "tags": "小说", "date": "2025/04/22", "status": "已读", "link": ""}, {"title": "象首", "author": "白井智之", "tags": "小说", "date": "2025/04/20", "status": "已读", "link": ""}, {"title": "百年孤独", "author": "加西亚马尔克斯", "tags": "小说", "date": "2025/03/31 → 2025/04/02", "status": "已读", "link": ""}, {"title": "当代英雄", "author": "莱蒙托夫", "tags": "小说", "date": "2025/03/28", "status": "已读", "link": ""}, {"title": "少年维特之烦恼", "author": "歌德", "tags": "小说", "date": "2025/03/13", "status": "已读", "link": ""}, {"title": "平凡的世界", "author": "路遥", "tags": "小说", "date": "2025/03/02 → 2025/03/04", "status": "已读", "link": ""}, {"title": "毛泽东传", "author": "迪克威尔逊", "tags": "", "date": "2025/02/16", "status": "已读", "link": ""}, {"title": "白夜", "author": "陀思妥耶夫斯基", "tags": "", "date": "2025/01/18", "status": "已读", "link": ""}, {"title": "置身事内", "author": "", "tags": "经济", "date": "2025/01/01", "status": "暂弃", "link": ""}, {"title": "素食者", "author": "韩江", "tags": "", "date": "2024/10/16", "status": "已读", "link": ""}, {"title": "智慧的疆界", "author": "周志明", "tags": "科普", "date": "2024/06/12 → 2024/06/15", "status": "已读", "link": ""}, {"title": "乌合之众", "author": "", "tags": "社科", "date": "2024/05/01", "status": "在读", "link": ""}, {"title": "叫魂", "author": "孔飞力", "tags": "社科", "date": "2024/03/16 → 2024/03/25", "status": "已读", "link": ""}, {"title": "傲慢与偏见", "author": "简奥古斯汀", "tags": "小说", "date": "2024/01/25 → 2024/04/30", "status": "已读", "link": ""}, {"title": "一个陌生女人的来信", "author": "茨威格", "tags": "小说", "date": "2023/12/31", "status": "已读", "link": ""}, {"title": "夜色朦胧", "author": "茨威格", "tags": "小说", "date": "2023/12/31", "status": "已读", "link": ""}, {"title": "我们生活在南京", "author": "", "tags": "", "date": "2023/12/29", "status": "已读", "link": ""}, {"title": "窄门", "author": "安德烈纪德", "tags": "小说", "date": "2023/12/28", "status": "已读", "link": ""}, {"title": "金阁寺", "author": "三岛由纪夫", "tags": "小说", "date": "2023/12/24 → 2023/12/27", "status": "已读", "link": ""}, {"title": "变形记", "author": "卡夫卡", "tags": "小说", "date": "2023/12/20 → 2023/12/23", "status": "已读", "link": ""}, {"title": "深入理解计算机系统（CSAPP）", "author": "", "tags": "理工", "date": "2023/10/07", "status": "", "link": ""}, {"title": "保卫马克思", "author": "阿尔都塞", "tags": "哲学,论文", "date": "2023/07/23", "status": "", "link": ""}, {"title": "悉达多", "author": "黑塞", "tags": "小说", "date": "2023/07/19 → 2023/07/21", "status": "已读", "link": ""}, {"title": "荒原狼", "author": "黑塞", "tags": "", "date": "2023/06/12 → 2023/07/18", "status": "已读", "link": ""}, {"title": "长安的荔枝", "author": "马伯庸", "tags": "", "date": "2023/06/11 → 2023/06/11", "status": "已读", "link": ""}, {"title": "沧浪之水", "author": "闫真", "tags": "", "date": "2023/05/29 → 2023/06/01", "status": "已读", "link": ""}, {"title": "单向度的人", "author": "马尔库塞", "tags": "哲学", "date": "2023/03/16", "status": "", "link": ""}, {"title": "临床拉康", "author": "布鲁斯芬克", "tags": "哲学", "date": "2023/03/14", "status": "暂弃", "link": ""}, {"title": "景观社会", "author": "居伊德波", "tags": "哲学", "date": "2023/03/03 → 2023/03/15", "status": "已读", "link": ""}, {"title": "面纱", "author": "毛姆", "tags": "小说", "date": "2023/02/26 → 2023/03/03", "status": "已读", "link": ""}, {"title": "统计学习方法概论", "author": "", "tags": "", "date": "2023/02/14", "status": "", "link": ""}, {"title": "月亮与六便士", "author": "毛姆", "tags": "小说", "date": "2023/02/07 → 2023/02/23", "status": "已读", "link": ""}, {"title": "小径分叉的花园", "author": "博尔赫斯", "tags": "小说", "date": "2023/01/05 → 2023/01/31", "status": "已读", "link": ""}, {"title": "查拉图斯特拉如是说", "author": "尼采", "tags": "", "date": "2022/11/01", "status": "", "link": ""}, {"title": "苏轼词集", "author": "", "tags": "", "date": "2022/11/01", "status": "", "link": ""}, {"title": "一本书看透信贷", "author": "何华平", "tags": "经济", "date": "2022/10/10 → 2022/10/26", "status": "已读", "link": ""}, {"title": "地下室手记", "author": "陀思妥耶夫斯基", "tags": "小说", "date": "2022/10/09 → 2022/10/16", "status": "已读", "link": ""}, {"title": "不能承受的生命之轻", "author": "米兰昆德拉", "tags": "小说", "date": "2022/10/04 → 2022/10/06", "status": "已读", "link": "http://chenxiyuan.xyz:4001/book/6"}, {"title": "博尔赫斯诗选", "author": "博尔赫斯", "tags": "诗集", "date": "2022/10/01 → 2022/10/08", "status": "已读", "link": "http://chenxiyuan.xyz:4001/book/42"}, {"title": "纯粹理性批判", "author": "康德", "tags": "哲学", "date": "2022/09/30", "status": "在读", "link": "http://chenxiyuan.xyz:4001/book/46"}, {"title": "经济学思想史进阶讲义", "author": "汪丁丁", "tags": "社科,经济", "date": "2022/09/27", "status": "在读", "link": "http://chenxiyuan.xyz:4001/book/44"}, {"title": "厌女", "author": "上野千鹤子", "tags": "哲学,社科", "date": "2022/09/22 → 2022/09/30", "status": "粗读", "link": "http://chenxiyuan.xyz:4001/book/43"}, {"title": "近代哲学史", "author": "谢林", "tags": "哲学", "date": "2022/09/12", "status": "已读", "link": "http://chenxiyuan.xyz:4001/book/11"}, {"title": "鼠疫", "author": "加缪", "tags": "小说", "date": "2022/08/26 → 2022/09/09", "status": "已读", "link": "http://chenxiyuan.xyz4001/book/2"}, {"title": "物理学的的进化", "author": "爱因斯坦和英费尔德", "tags": "科普", "date": "2022/06/03", "status": "暂弃", "link": ""}, {"title": "上帝掷骰子吗", "author": "曹天元", "tags": "科普,量子场论", "date": "2022/05/08 → 2022/05/20", "status": "已读", "link": "http://chenxiyuan.xyz:4001/book/14"}, {"title": "规训与惩罚", "author": "福柯", "tags": "哲学", "date": "2022/04/30", "status": "已读", "link": ""}, {"title": "存在主义是一种人道主义", "author": "萨特", "tags": "论文,哲学", "date": "2022/04/24", "status": "已读", "link": "http://chenxiyuan.xyz:4001/book/8"}, {"title": "梦的解析", "author": "弗洛伊德", "tags": "哲学", "date": "2022/03/10", "status": "已读", "link": ""}, {"title": "阅读你的症状", "author": "吴琼", "tags": "科普,哲学", "date": "2022/01/20", "status": "已读", "link": "http://chenxiyuan.xyz:4001/book/19"}, {"title": "局外人", "author": "加缪", "tags": "小说", "date": "2022/01/09 → 2022/01/20", "status": "已读", "link": "http://chenxiyuan.xyz:4001/book/22"}, {"title": "西方哲学史：从古希腊到当下", "author": "希尔贝克", "tags": "哲学", "date": "2022/01/01", "status": "已读", "link": "http://chenxiyuan.xyz:4001/book/1"}, {"title": "罪与罚", "author": "陀思妥耶夫斯基", "tags": "小说", "date": "2021/10/28 → 2021/11/04", "status": "已读", "link": "http://chenxiyuan.xyz:4001/book/21"}];
+var MOVIES = [{"title": "庭院里的女人", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2026/05/15", "douban": ""}, {"title": "给阿嬷的情书", "country": "中国", "type": "电影", "tags": "剧情", "rating": "🌟🌟🌟🌟", "date": "2026/05/13", "douban": ""}, {"title": "大鱼", "country": "美国", "type": "电影", "tags": "", "rating": "🌟🌟🌟🌟", "date": "2026/04/25", "douban": ""}, {"title": "风之画员", "country": "韩国", "type": "剧集", "tags": "", "rating": "🌟🌟🌟🌟🌟", "date": "2026/01/13", "douban": ""}, {"title": "怪奇物语", "country": "", "type": "剧集", "tags": "", "rating": "", "date": "2026/01/03", "douban": ""}, {"title": "疯狂动物城2", "country": "", "type": "", "tags": "", "rating": "", "date": "2025/12/25", "douban": ""}, {"title": "南京照相馆", "country": "", "type": "电影", "tags": "", "rating": "", "date": "2025/08/10", "douban": ""}, {"title": "幽灵公主", "country": "", "type": "电影", "tags": "", "rating": "", "date": "2025/05/02", "douban": ""}, {"title": "蝴蝶君", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2025/04/04", "douban": ""}, {"title": "戏梦巴黎", "country": "", "type": "", "tags": "", "rating": "", "date": "2025/03/30", "douban": ""}, {"title": "心灵奇旅", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟🌟", "date": "2025/03/14", "douban": ""}, {"title": "法证先锋", "country": "香港", "type": "剧集", "tags": "", "rating": "", "date": "2025/03/09", "douban": ""}, {"title": "深海", "country": "", "type": "", "tags": "", "rating": "", "date": "2025/02/21", "douban": ""}, {"title": "哪吒2", "country": "", "type": "", "tags": "", "rating": "", "date": "2025/02/19", "douban": ""}, {"title": "唐探3", "country": "", "type": "", "tags": "", "rating": "", "date": "2025/02/15", "douban": ""}, {"title": "唐探1", "country": "", "type": "", "tags": "", "rating": "", "date": "2025/02/14", "douban": ""}, {"title": "唐探2", "country": "", "type": "", "tags": "", "rating": "", "date": "2025/02/14", "douban": ""}, {"title": "让子弹飞", "country": "中国", "type": "电影", "tags": "", "rating": "🌟🌟🌟🌟🌟", "date": "2025/02/04", "douban": ""}, {"title": "芳华", "country": "", "type": "", "tags": "", "rating": "", "date": "2025/02/01", "douban": ""}, {"title": "哪吒1", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟🌟", "date": "2025/01/31", "douban": ""}, {"title": "是大臣1", "country": "", "type": "剧集", "tags": "", "rating": "", "date": "2025/01/03", "douban": ""}, {"title": "无间道2", "country": "", "type": "电影", "tags": "", "rating": "", "date": "2024/12/31", "douban": ""}, {"title": "无间道1", "country": "", "type": "电影", "tags": "", "rating": "", "date": "2024/12/27", "douban": ""}, {"title": "暮光之城", "country": "", "type": "", "tags": "", "rating": "", "date": "2024/12/26", "douban": ""}, {"title": "苹果酒和罗西", "country": "", "type": "电影", "tags": "剧情", "rating": "🌟🌟🌟", "date": "2024/04/26", "douban": ""}, {"title": "你想活出怎样的人生", "country": "日本", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2024/04/05", "douban": ""}, {"title": "周处除三害", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2024/03/12", "douban": ""}, {"title": "热辣滚烫", "country": "中国", "type": "电影", "tags": "剧情", "rating": "🌟🌟🌟", "date": "2024/02/25", "douban": ""}, {"title": "第二十条", "country": "", "type": "电影", "tags": "剧情", "rating": "🌟🌟🌟", "date": "2024/02/17", "douban": ""}, {"title": "世界的每一个早晨", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2024/02/06", "douban": ""}, {"title": "一天", "country": "", "type": "电影", "tags": "剧情", "rating": "🌟🌟🌟", "date": "2024/01/27", "douban": ""}, {"title": "伦敦一家人", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2024/01/21 09:00", "douban": ""}, {"title": "怪兽大学", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2024/01/19", "douban": ""}, {"title": "怪兽电力公司", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2024/01/19", "douban": ""}, {"title": "海边的曼彻斯特", "country": "", "type": "电影", "tags": "剧情", "rating": "🌟🌟🌟", "date": "2024/01/18", "douban": ""}, {"title": "神女", "country": "中国", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2024/01/16", "douban": ""}, {"title": "傲慢与偏见", "country": "", "type": "电影", "tags": "剧情", "rating": "🌟🌟🌟", "date": "2024/01/12", "douban": ""}, {"title": "三大队", "country": "中国", "type": "电影", "tags": "剧情", "rating": "🌟🌟🌟", "date": "2024/01/10", "douban": ""}, {"title": "小明和王猫", "country": "中国", "type": "", "tags": "", "rating": "🌟🌟🌟", "date": "2023/12/28", "douban": ""}, {"title": "登堂入室", "country": "法国", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2023/12/28", "douban": ""}, {"title": "新闻女王", "country": "", "type": "剧集", "tags": "", "rating": "🌟🌟🌟", "date": "2023/12/21 → 2023/12/24", "douban": ""}, {"title": "死期将至", "country": "韩国", "type": "剧集", "tags": "悬疑,剧情", "rating": "🌟🌟🌟", "date": "2023/12/19 → 2024/01/05", "douban": ""}, {"title": "溺水小刀", "country": "日本", "type": "电影", "tags": "爱情", "rating": "🌟🌟🌟", "date": "2023/12/17", "douban": ""}, {"title": "魔女宅急便", "country": "日本", "type": "电影", "tags": "动画", "rating": "🌟🌟🌟", "date": "2023/11/25", "douban": ""}, {"title": "黑天鹅", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2023/11/23", "douban": ""}, {"title": "搏击俱乐部", "country": "美国", "type": "电影", "tags": "", "rating": "🌟🌟🌟🌟", "date": "2023/11/18", "douban": ""}, {"title": "红猪", "country": "日本", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2023/11/18", "douban": ""}, {"title": "疯狂动物城", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟🌟", "date": "2023/09/25", "douban": ""}, {"title": "律政俏佳人", "country": "", "type": "", "tags": "", "rating": "🌟🌟🌟", "date": "2023/09/02", "douban": ""}, {"title": "一枝梨花压海棠", "country": "", "type": "", "tags": "", "rating": "🌟🌟🌟", "date": "2023/09/01", "douban": ""}, {"title": "奥本海默", "country": "", "type": "", "tags": "", "rating": "🌟🌟🌟🌟", "date": "2023/08/30", "douban": ""}, {"title": "情书", "country": "", "type": "", "tags": "", "rating": "🌟🌟🌟", "date": "2023/08/28", "douban": ""}, {"title": "少年汉尼拔", "country": "", "type": "", "tags": "", "rating": "🌟🌟🌟", "date": "2023/08/24", "douban": ""}, {"title": "封神第一部", "country": "", "type": "", "tags": "", "rating": "🌟🌟🌟", "date": "2023/08/20", "douban": ""}, {"title": "孤注一掷", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟🌟", "date": "2023/08/13", "douban": ""}, {"title": "花样年华", "country": "", "type": "", "tags": "", "rating": "🌟🌟🌟", "date": "2023/08/07", "douban": ""}, {"title": "分手的决心", "country": "韩国", "type": "电影", "tags": "", "rating": "🌟🌟🌟🌟", "date": "2023/07/30", "douban": ""}, {"title": "恋恋笔记本", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2023/07/22", "douban": ""}, {"title": "长安三万里", "country": "", "type": "", "tags": "", "rating": "🌟🌟🌟", "date": "2023/07/14", "douban": ""}, {"title": "色戒", "country": "", "type": "", "tags": "", "rating": "🌟🌟🌟🌟", "date": "2023/07/11", "douban": ""}, {"title": "八角笼中", "country": "", "type": "", "tags": "", "rating": "🌟🌟🌟", "date": "2023/07/09", "douban": ""}, {"title": "宇宙探索编辑部", "country": "", "type": "", "tags": "", "rating": "🌟🌟🌟", "date": "2023/06/18", "douban": ""}, {"title": "天空之城", "country": "", "type": "", "tags": "", "rating": "🌟🌟🌟🌟", "date": "2023/06/04", "douban": ""}, {"title": "猫鼠游戏", "country": "", "type": "电影", "tags": "剧情", "rating": "🌟🌟🌟🌟", "date": "2023/05/27", "douban": ""}, {"title": "笑傲江湖2", "country": "香港", "type": "电影", "tags": "剧情", "rating": "🌟🌟🌟", "date": "2023/05/26", "douban": ""}, {"title": "新龙门客栈", "country": "中国,香港", "type": "电影", "tags": "剧情,动作", "rating": "🌟🌟🌟", "date": "2023/05/25", "douban": ""}, {"title": "起风了", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2023/05/22", "douban": ""}, {"title": "喜剧之王", "country": "香港,中国", "type": "电影", "tags": "剧情,喜剧", "rating": "🌟🌟🌟", "date": "2023/05/16", "douban": ""}, {"title": "铃芽之旅", "country": "日本", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2023/03/26", "douban": ""}, {"title": "哈尔的移动城堡", "country": "日本", "type": "电影", "tags": "", "rating": "🌟🌟🌟🌟", "date": "2023/03/19", "douban": ""}, {"title": "悬崖上的金鱼姬", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2023/02/23", "douban": ""}, {"title": "千与千寻", "country": "日本", "type": "电影", "tags": "", "rating": "🌟🌟🌟🌟", "date": "2023/02/17", "douban": ""}, {"title": "2001太空漫游", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟🌟🌟", "date": "2023/02/08", "douban": ""}, {"title": "三体真人版", "country": "", "type": "剧集", "tags": "", "rating": "🌟🌟🌟", "date": "2023/02/06", "douban": ""}, {"title": "1917", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2023/02/05", "douban": ""}, {"title": "瞬息全宇宙", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2023/02/03", "douban": ""}, {"title": "流浪地球2", "country": "中国", "type": "电影", "tags": "科幻", "rating": "🌟🌟🌟🌟🌟", "date": "2023/01/24", "douban": "https://movie.douban.com/subject/35267208/"}, {"title": "爱在日落黄昏时", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2023/01/23", "douban": ""}, {"title": "爱在午夜降临前", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2023/01/23", "douban": ""}, {"title": "中国奇谭", "country": "", "type": "剧集", "tags": "", "rating": "🌟🌟", "date": "2023/01/22", "douban": ""}, {"title": "爱在黎明破晓前", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2023/01/22", "douban": ""}, {"title": "赎罪", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟🌟", "date": "2023/01/14", "douban": ""}, {"title": "美丽人生", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟🌟🌟", "date": "2022/12/31", "douban": ""}, {"title": "花束般的恋爱", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2022/12/27", "douban": ""}, {"title": "真爱至上", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2022/12/25", "douban": ""}, {"title": "亚当斯一家的价值观", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2022/12/21", "douban": ""}, {"title": "星期三", "country": "", "type": "剧集", "tags": "", "rating": "🌟🌟🌟", "date": "2022/12/17", "douban": ""}, {"title": "星球大战幽灵的威胁", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2022/11/29", "douban": ""}, {"title": "西线无战事", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2022/11/24", "douban": "https://movie.douban.com/subject/3042261/"}, {"title": "时空恋旅人", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2022/11/13", "douban": "https://movie.douban.com/subject/10577869/"}, {"title": "暴裂无声", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2022/11/02", "douban": "https://movie.douban.com/subject/26647117/"}, {"title": "了不起的盖茨比", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2022/10/28", "douban": "https://movie.douban.com/subject/3364223/"}, {"title": "那人那山那狗", "country": "中国", "type": "电影", "tags": "", "rating": "🌟🌟🌟", "date": "2022/10/13", "douban": "https://movie.douban.com/subject/1307766/"}, {"title": "赛博朋克边缘行者", "country": "", "type": "剧集", "tags": "", "rating": "🌟🌟", "date": "2022/10/02", "douban": "https://movie.douban.com/subject/35118256/"}, {"title": "放牛班的春天", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟🌟", "date": "2022/09/27", "douban": "https://movie.douban.com/subject/1291549/"}, {"title": "死亡诗社", "country": "", "type": "电影", "tags": "", "rating": "🌟🌟🌟🌟🌟", "date": "2022/09/18", "douban": "https://movie.douban.com/subject/1291548/"}, {"title": "穆赫兰道（浮生若梦）", "country": "", "type": "电影", "tags": "悬疑", "rating": "🌟🌟🌟🌟", "date": "2022/09/12", "douban": "https://movie.douban.com/subject/1292217/"}, {"title": "犬之岛", "country": "日本,美国,德国,英国", "type": "电影", "tags": "喜剧,动画,冒险", "rating": "🌟🌟🌟", "date": "2022/09/04", "douban": "https://movie.douban.com/subject/26640371/"}, {"title": "布达佩斯大饭店", "country": "美国,德国,英国", "type": "电影", "tags": "剧情,喜剧,冒险", "rating": "🌟🌟🌟", "date": "2022/09/03", "douban": "https://movie.douban.com/subject/11525673/"}, {"title": "隐入尘烟", "country": "中国", "type": "电影", "tags": "剧情,家庭", "rating": "🌟🌟🌟", "date": "2022/08/28", "douban": "https://movie.douban.com/subject/35131346/"}, {"title": "禁闭岛", "country": "美国", "type": "电影", "tags": "剧情,悬疑,惊悚", "rating": "🌟🌟🌟🌟", "date": "2022/08/27", "douban": "https://movie.douban.com/subject/2334904/"}, {"title": "异物志", "country": "中国", "type": "剧集", "tags": "奇幻,悬疑,动作", "rating": "🌟🌟🌟", "date": "2022/05/16", "douban": "https://movie.douban.com/subject/26889177/"}, {"title": "驾驶我的车", "country": "日本", "type": "电影", "tags": "剧情", "rating": "🌟🌟🌟", "date": "2022/04/01", "douban": "https://movie.douban.com/subject/35235502/"}, {"title": "银翼杀手", "country": "美国", "type": "电影", "tags": "惊悚,科幻", "rating": "🌟🌟🌟", "date": "2022/03/21", "douban": "https://movie.douban.com/subject/1291839/"}, {"title": "攻壳机动队", "country": "日本", "type": "电影", "tags": "动作,科幻,动画", "rating": "🌟🌟🌟", "date": "2022/03/19", "douban": "https://movie.douban.com/subject/1291936/"}, {"title": "放大 Blow-Up", "country": "美国,意大利,英国", "type": "电影", "tags": "悬疑,惊悚,剧情", "rating": "🌟🌟🌟", "date": "2022/02/07", "douban": "https://movie.douban.com/subject/1310176/"}, {"title": "Hello！树先生", "country": "中国", "type": "电影", "tags": "剧情", "rating": "🌟🌟🌟🌟", "date": "2022/01/16", "douban": "https://movie.douban.com/subject/4135710/"}, {"title": "活着", "country": "中国", "type": "电影", "tags": "剧情,家庭,历史", "rating": "🌟🌟🌟🌟", "date": "2021/12/17", "douban": "https://movie.douban.com/subject/1292365/"}, {"title": "何以为家", "country": "黎巴嫩", "type": "电影", "tags": "剧情", "rating": "🌟🌟🌟", "date": "2021/12/16", "douban": "https://movie.douban.com/subject/30170448/"}, {"title": "末代皇帝", "country": "英国,意大利,中国", "type": "电影", "tags": "剧情,传记,历史", "rating": "🌟🌟🌟🌟", "date": "2021/12/13", "douban": "https://movie.douban.com/subject/1293172/"}, {"title": "头号玩家", "country": "美国", "type": "电影", "tags": "动作,科幻,冒险", "rating": "🌟🌟🌟", "date": "2021/12/12", "douban": "https://movie.douban.com/subject/4920389/"}, {"title": "楚门的世界", "country": "美国", "type": "电影", "tags": "剧情,科幻", "rating": "🌟🌟🌟🌟", "date": "2021/12/11", "douban": "https://movie.douban.com/subject/1292064/"}, {"title": "星际穿越", "country": "美国,英国,加拿大", "type": "电影", "tags": "剧情,科幻,冒险", "rating": "🌟🌟🌟🌟🌟", "date": "2021/12/10", "douban": "https://movie.douban.com/subject/1889243/"}, {"title": "盗梦空间", "country": "英国,美国", "type": "电影", "tags": "悬疑,剧情,科幻,冒险", "rating": "🌟🌟🌟🌟🌟", "date": "2021/12/09", "douban": "https://movie.douban.com/subject/3541415/"}, {"title": "绿皮书", "country": "美国", "type": "电影", "tags": "剧情,音乐,喜剧,传记", "rating": "🌟🌟🌟", "date": "2021/12/08", "douban": "https://movie.douban.com/subject/27060077/"}, {"title": "海上钢琴师", "country": "意大利", "type": "电影", "tags": "剧情,音乐", "rating": "🌟🌟🌟🌟🌟", "date": "2021/12/06", "douban": "https://movie.douban.com/subject/1292001/"}, {"title": "鱿鱼游戏", "country": "韩国", "type": "剧集", "tags": "悬疑,剧情", "rating": "🌟🌟🌟", "date": "2021/10/14", "douban": "https://movie.douban.com/subject/34812928/"}, {"title": "霸王别姬", "country": "中国,香港", "type": "电影", "tags": "剧情,爱情,同性,历史", "rating": "🌟🌟🌟🌟🌟", "date": "2021/09/11", "douban": "https://movie.douban.com/subject/1291546/"}];
+
+function parseDate(d){if(!d)return'0000';var m=d.match(/(\d{4})[\/\-](\d{2})[\/\-](\d{2})/);return m?m[1]+m[2]+m[3]:'0000'}
+BOOKS.sort(function(a,b){return parseDate(b.date)-parseDate(a.date)});
+MOVIES.sort(function(a,b){return parseDate(b.date)-parseDate(a.date)});
+
+var bookSort={dir:0}, movieSort={dir:0};
+var bookData=BOOKS.slice(), movieData=MOVIES.slice();
+
+var filters={
+  'books-tags':'','books-status':'',
+  'movies-type':'','movies-tags':'','movies-rating':''
+};
+
+// --- Language ---
+var L={
+  en:{
+    'tab-books':'Reading','tab-movies':'Watching',
+    'search-books':'Search books...','search-movies':'Search movies...',
+    'th-title':'Title','th-author':'Author','th-tags':'Tags','th-date':'Date','th-status':'Status',
+    'th-region':'Region','th-type':'Type','th-rating':'Rating',
+    'all':'All','no-result':'No matching results'
+  },
+  zh:{
+    'tab-books':'阅读清单','tab-movies':'观影归档',
+    'search-books':'搜索书名、作者...','search-movies':'搜索片名、地区...',
+    'th-title':'书名','th-author':'作者','th-tags':'标签','th-date':'日期','th-status':'状态',
+    'th-region':'地区','th-type':'类型','th-rating':'评分',
+    'all':'全部','no-result':'没有匹配的结果'
+  }
+};
+var lang=localStorage.getItem('lang')||'en';
+function t(key){return L[lang][key]||key}
+
+// --- Theme ---
+var theme=localStorage.getItem('theme')||'auto';
+function applyTheme(){
+  var prefersDark=window.matchMedia('(prefers-color-scheme:dark)').matches;
+  var isDark=theme==='dark'||(theme==='auto'&&prefersDark);
+  document.documentElement.setAttribute('data-theme',isDark?'dark':'light');
+  document.getElementById('theme-btn').textContent=theme==='auto'?'🌓':isDark?'🌙':'☀';
+}
+function toggleTheme(){
+  theme=theme==='auto'?'dark':theme==='dark'?'light':'auto';
+  localStorage.setItem('theme',theme);applyTheme();
+}
+window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',function(){if(theme==='auto')applyTheme()});
+
+// --- Rendering ---
+var TAG_COLORS={
+  "小说":"小说","哲学":"哲学","科普":"科普","社科":"社科","经济":"经济",
+  "理工":"理工","诗集":"诗集","论文":"论文","量子场论":"量子场论",
+  "剧情":"剧情","悬疑":"悬疑","爱情":"爱情","科幻":"科幻","动画":"动画",
+  "动作":"动作","喜剧":"喜剧","冒险":"冒险","惊悚":"惊悚","历史":"历史",
+  "音乐":"音乐","传记":"传记","家庭":"家庭","奇幻":"奇幻","同性":"同性","犯罪":"犯罪"
+};
+function getTagClass(tag){var t=tag.trim();return TAG_COLORS[t]?'tag tag-'+TAG_COLORS[t]:'tag tag-default'}
+function tagHtml(raw){
+  if(!raw)return'<span class="empty">-</span>';
+  var tags=raw.replace(/,/g,',').split(',');
+  var out='';
+  tags.forEach(function(t){t=t.trim();if(t)out+='<span class="'+getTagClass(t)+'">'+t+'</span>'});
+  return out||'<span class="empty">-</span>';
+}
+
+function switchTab(type){
+  document.querySelectorAll('.tab').forEach(function(t,i){
+    t.classList.toggle('active',(type==='books'&&i===0)||(type==='movies'&&i===1));
+  });
+  document.getElementById('panel-books').classList.toggle('active',type==='books');
+  document.getElementById('panel-movies').classList.toggle('active',type==='movies');
+  document.getElementById('search-books-wrap').style.display=type==='books'?'':'none';
+  document.getElementById('search-movies-wrap').style.display=type==='movies'?'':'none';
+}
+
+function renderBooks(data){
+  var tbody=document.getElementById('books-tbody');
+  if(!data.length){tbody.innerHTML='';document.getElementById('books-empty').style.display='block';return}
+  document.getElementById('books-empty').style.display='none';
+  var sm={'已读':'✅','在读':'📖','暂弃':'⏸️','粗读':'📝'};
+  var html='';
+  data.forEach(function(b){
+    var author=b.author||'<span class="empty">-</span>';
+    var date=b.date||'<span class="empty">-</span>';
+    var status=b.status||'-';
+    var emoji=sm[status]||'📌';
+    var title=b.link?'<a class="link" href="'+b.link+'" target="_blank">'+b.title+'</a>':b.title;
+    html+='<tr><td>'+title+'</td><td>'+author+'</td><td>'+tagHtml(b.tags)+'</td><td style="white-space:nowrap">'+date+'</td><td><span class="status-badge">'+emoji+' '+status+'</span></td></tr>';
+  });
+  tbody.innerHTML=html;
+}
+
+function renderMovies(data){
+  var tbody=document.getElementById('movies-tbody');
+  if(!data.length){tbody.innerHTML='';document.getElementById('movies-empty').style.display='block';return}
+  document.getElementById('movies-empty').style.display='none';
+  var html='';
+  data.forEach(function(m){
+    var country=m.country||'<span class="empty">-</span>';
+    var mtype=m.type||'<span class="empty">-</span>';
+    var date=m.date||'<span class="empty">-</span>';
+    var sc=(m.rating.match(/🌟/g)||[]).length;
+    var stars=sc>0?'<span class="stars">'+'⭐'.repeat(sc)+'</span>':'<span class="empty">-</span>';
+    var title=m.douban?'<a class="link" href="'+m.douban+'" target="_blank">'+m.title+'</a>':m.title;
+    html+='<tr><td>'+title+'</td><td>'+country+'</td><td>'+mtype+'</td><td>'+tagHtml(m.tags)+'</td><td>'+stars+'</td><td style="white-space:nowrap">'+date+'</td></tr>';
+  });
+  tbody.innerHTML=html;
+}
+
+
+// --- Dropdowns ---
+function getUniqueTags(source,field){
+  var set={};
+  source.forEach(function(item){
+    var raw=item[field]||'';
+    raw.replace(/,/g,',').split(',').forEach(function(t){t=t.trim();if(t)set[t]=true});
+  });
+  return Object.keys(set).sort();
+}
+function ce(tag,cls,id,html){var e=document.createElement(tag);e.className=cls;if(id)e.id=id;e.innerHTML=html;return e}
+function buildDropdown(id,options,labelFn){
+  var html='<button class="item selected" data-val="" onclick="setFilter(\''+id+'\',\'\')">'+t('all')+'</button>';
+  options.forEach(function(opt){
+    var label=labelFn?labelFn(opt):opt;
+    html+='<button class="item" data-val="'+opt+'" onclick="setFilter(\''+id+'\',\''+opt.replace(/'/g,"\\'")+'\')">'+label+'</button>';
+  });
+  return html;
+}
+function clearDropdowns(){
+  document.querySelectorAll('.dropdown').forEach(function(d){d.remove()});
+}
+function initDropdowns(){
+  clearDropdowns();
+  var bth=document.querySelectorAll('#table-books th');
+  var bookTags=getUniqueTags(BOOKS,'tags');
+  bth[2].appendChild(ce('div','dropdown','dd-books-tags',buildDropdown('books-tags',bookTags)));
+  bth[4].appendChild(ce('div','dropdown','dd-books-status',buildDropdown('books-status',['已读','在读','暂弃','粗读'])));
+  var mth=document.querySelectorAll('#table-movies th');
+  mth[2].appendChild(ce('div','dropdown','dd-movies-type',buildDropdown('movies-type',['电影','剧集'])));
+  var movieTags=getUniqueTags(MOVIES,'tags');
+  mth[3].appendChild(ce('div','dropdown','dd-movies-tags',buildDropdown('movies-tags',movieTags)));
+  mth[4].appendChild(ce('div','dropdown','dd-movies-rating',buildDropdown('movies-rating',['1','2','3','4','5'],function(n){return'⭐'.repeat(parseInt(n))})));
+}
+function toggleDropdown(e,id){
+  e.stopPropagation();
+  var dd=document.getElementById('dd-'+id);
+  var isOpen=dd.classList.contains('show');
+  closeAllDropdowns();
+  if(!isOpen)dd.classList.add('show');
+}
+function closeAllDropdowns(){
+  document.querySelectorAll('.dropdown').forEach(function(d){d.classList.remove('show')});
+}
+function setFilter(id,value){
+  filters[id]=value;closeAllDropdowns();
+  var dd=document.getElementById('dd-'+id);
+  dd.querySelectorAll('.item').forEach(function(item){
+    item.classList.toggle('selected',item.getAttribute('data-val')===value);
+  });
+  filterTable(id.split('-')[0]);
+}
+document.addEventListener('click',function(){closeAllDropdowns()});
+
+// --- Sort (date only) ---
+function sortTable(type,th){
+  var state=type==='books'?bookSort:movieSort;
+  state.dir=(state.dir+1)%3;
+  th.classList.toggle('sorted',state.dir>0);
+  th.querySelector('.arrow').textContent=state.dir===0?'⇅':state.dir===1?'↑':'↓';
+  var data=(type==='books'?bookData:movieData).slice();
+  if(state.dir>0){data.sort(function(a,b){var va=parseDate(a.date),vb=parseDate(b.date);return state.dir===1?vb-va:va-vb})}
+  else{data.sort(function(a,b){return parseDate(b.date)-parseDate(a.date)})}
+  if(type==='books'){bookData=data;renderBooks(data)}else{movieData=data;renderMovies(data)}
+}
+
+// --- Filter ---
+function filterTable(type){
+  var query=document.getElementById('search-'+type).value.toLowerCase();
+  var source=type==='books'?BOOKS:MOVIES;
+  var state=type==='books'?bookSort:movieSort;
+  var data=source.slice();
+  if(state.dir>0){data.sort(function(a,b){var va=parseDate(a.date),vb=parseDate(b.date);return state.dir===1?vb-va:va-vb})}
+  else{data.sort(function(a,b){return parseDate(b.date)-parseDate(a.date)})}
+  if(type==='books'){
+    if(filters['books-tags'])data=data.filter(function(b){return(b.tags||'').indexOf(filters['books-tags'])!==-1});
+    if(filters['books-status'])data=data.filter(function(b){return b.status===filters['books-status']});
+  }else{
+    if(filters['movies-type'])data=data.filter(function(m){return m.type===filters['movies-type']});
+    if(filters['movies-tags'])data=data.filter(function(m){return(m.tags||'').indexOf(filters['movies-tags'])!==-1});
+    if(filters['movies-rating'])data=data.filter(function(m){return(m.rating.match(/🌟/g)||[]).length===parseInt(filters['movies-rating'])});
+  }
+  if(query){data=data.filter(function(item){return Object.values(item).join(' ').toLowerCase().indexOf(query)!==-1})}
+  if(type==='books'){bookData=data;renderBooks(data)}else{movieData=data;renderMovies(data)}
+}
+
+// --- Lang apply ---
+function applyLang(){
+  document.querySelectorAll('[data-lang]').forEach(function(el){
+    var k=el.getAttribute('data-lang');
+    if(el.tagName==='INPUT')el.placeholder=t(k);else el.textContent=t(k);
+  });
+  document.querySelectorAll('.tab').forEach(function(tab){var k=tab.getAttribute('data-lang');if(k)tab.textContent=t(k)});
+  document.getElementById('lang-btn').textContent=lang==='en'?'中':'EN';
+  document.getElementById('books-empty').textContent=t('no-result');
+  document.getElementById('movies-empty').textContent=t('no-result');
+  renderBooks(bookData);renderMovies(movieData);
+  initDropdowns();
+  updateFooter();
+}
+function toggleLang(){lang=lang==='en'?'zh':'en';localStorage.setItem('lang',lang);applyLang()}
+
+// --- Footer ---
+function updateFooter(){
+  var f=document.querySelector('footer');
+  var d=new Date(); var ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  if(f)f.innerHTML=ds+' &middot; '+BOOKS.length+' books / '+MOVIES.length+' screens';
+}
+
+// Init
+applyTheme();
+initDropdowns();
+renderBooks(bookData);
+renderMovies(movieData);
+updateFooter();
+if(lang==='zh')applyLang();
+else document.getElementById('lang-btn').textContent='中';
+</script>
+</body>
+</html>
