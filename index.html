@@ -58,7 +58,7 @@ header::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:2px
 .toolbar input::placeholder{color:#bbb}
 .table-wrap{
   background:var(--card);border:1px solid var(--border);
-  border-radius:var(--radius);overflow:hidden;
+  border-radius:var(--radius);overflow:visible;
   box-shadow:0 1px 3px rgba(0,0,0,.04),0 2px 8px rgba(0,0,0,.04);
   transition:box-shadow .25s;
 }
@@ -372,22 +372,24 @@ function clearDropdowns(){
 }
 function initDropdowns(){
   clearDropdowns();
-  var bth=document.querySelectorAll('#table-books th');
-  var bookTags=getUniqueTags(BOOKS,'tags');
-  bth[2].appendChild(ce('div','dropdown','dd-books-tags',buildDropdown('books-tags',bookTags)));
-  bth[4].appendChild(ce('div','dropdown','dd-books-status',buildDropdown('books-status',['已读','在读','暂弃','粗读'])));
-  var mth=document.querySelectorAll('#table-movies th');
-  mth[2].appendChild(ce('div','dropdown','dd-movies-type',buildDropdown('movies-type',['电影','剧集'])));
-  var movieTags=getUniqueTags(MOVIES,'tags');
-  mth[3].appendChild(ce('div','dropdown','dd-movies-tags',buildDropdown('movies-tags',movieTags)));
-  mth[4].appendChild(ce('div','dropdown','dd-movies-rating',buildDropdown('movies-rating',['1','2','3','4','5'],function(n){return'⭐'.repeat(parseInt(n))})));
+  var body=document.body;
+  body.appendChild(ce('div','dropdown','dd-books-tags',buildDropdown('books-tags',getUniqueTags(BOOKS,'tags'))));
+  body.appendChild(ce('div','dropdown','dd-books-status',buildDropdown('books-status',['已读','在读','暂弃','粗读'])));
+  body.appendChild(ce('div','dropdown','dd-movies-type',buildDropdown('movies-type',['电影','剧集'])));
+  body.appendChild(ce('div','dropdown','dd-movies-tags',buildDropdown('movies-tags',getUniqueTags(MOVIES,'tags'))));
+  body.appendChild(ce('div','dropdown','dd-movies-rating',buildDropdown('movies-rating',['1','2','3','4','5'],function(n){return'⭐'.repeat(parseInt(n))})));
 }
 function toggleDropdown(e,id){
   e.stopPropagation();
-  var dd=document.getElementById('dd-'+id);
-  var isOpen=dd.classList.contains('show');
   closeAllDropdowns();
-  if(!isOpen)dd.classList.add('show');
+  var dd=document.getElementById('dd-'+id);
+  if(dd.classList.contains('show'))return;
+  var rect=e.currentTarget.getBoundingClientRect();
+  dd.style.position='fixed';
+  dd.style.top=(rect.bottom+4)+'px';
+  dd.style.left=rect.left+'px';
+  dd.style.minWidth=Math.max(150,rect.width)+'px';
+  dd.classList.add('show');
 }
 function closeAllDropdowns(){
   document.querySelectorAll('.dropdown').forEach(function(d){d.classList.remove('show')});
@@ -401,6 +403,8 @@ function setFilter(id,value){
   filterTable(id.split('-')[0]);
 }
 document.addEventListener('click',function(){closeAllDropdowns()});
+window.addEventListener('scroll',function(){closeAllDropdowns()},true);
+window.addEventListener('resize',function(){closeAllDropdowns()});
 
 // --- Sort (date only) ---
 function sortTable(type,th){
