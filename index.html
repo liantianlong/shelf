@@ -112,6 +112,7 @@ tbody tr:hover{background:var(--hover);transform:translateX(3px)}
 .tag-历史{background:#fefce8;color:#a16207}
 .tag-音乐{background:#eef2ff;color:#4338ca}
 .tag-传记{background:#ecfdfa;color:#115e59}
+.tag-恐怖{background:#1a1a2e;color:#e94560}
 .tag-家庭{background:#ecfdf5;color:#15803d}
 .tag-奇幻{background:#f5f0ff;color:#6d28d9}
 .tag-同性{background:#fff0f3;color:#c9184a}
@@ -258,7 +259,8 @@ var MOVIES = [{"title": "庭院里的女人", "country": "", "type": "电影", "
 {"title": "猫的报恩", "country": "日本", "type": "电影", "tags": "动画", "rating": "", "date": "2026-06-20", "douban": ""},
 {"title": "侧耳倾听", "country": "日本", "type": "电影", "tags": "动画,剧情", "rating": "", "date": "2026-06-23", "douban": ""},
 {"title": "费城故事", "country": "美国", "type": "电影", "tags": "爱情,喜剧", "rating": "", "date": "2026-06-28", "douban": ""},
-{"title": "后室", "country": "美国", "type": "电影", "tags": "恐怖,科幻", "rating": "🌟🌟🌟", "date": "2026-07-09", "douban": ""}
+{"title": "后室", "country": "美国", "type": "电影", "tags": "恐怖,科幻", "rating": "🌟🌟🌟", "date": "2026-07-09", "douban": ""},
+	{"title": "痴迷", "country": "美国", "type": "电影", "tags": "恐怖,惊悚", "rating": "🌟🌟🌟", "date": "2026-07-12", "douban": "https://movie.douban.com/subject/37450627/"}
 ];
 
 function parseDate(d){if(!d)return'0000';var m=d.match(/(\d{4})[\/\-](\d{2})[\/\-](\d{2})/);return m?m[1]+m[2]+m[3]:'0000'}
@@ -313,7 +315,7 @@ var TAG_COLORS={
   "理工":"理工","诗集":"诗集","论文":"论文","量子场论":"量子场论",
   "剧情":"剧情","悬疑":"悬疑","爱情":"爱情","科幻":"科幻","动画":"动画",
   "动作":"动作","喜剧":"喜剧","冒险":"冒险","惊悚":"惊悚","历史":"历史",
-  "音乐":"音乐","传记":"传记","家庭":"家庭","奇幻":"奇幻","同性":"同性","犯罪":"犯罪"
+  "音乐":"音乐","传记":"传记","家庭":"家庭","奇幻":"奇幻","同性":"同性","犯罪":"犯罪","恐怖":"恐怖"
 };
 function getTagClass(tag){var t=tag.trim();return TAG_COLORS[t]?'tag tag-'+TAG_COLORS[t]:'tag tag-default'}
 function tagHtml(raw){
